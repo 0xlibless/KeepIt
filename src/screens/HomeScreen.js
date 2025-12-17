@@ -1,17 +1,56 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import LogoText from '../assets/Icons/Logos/LogoText.png';
 import CardStack from '../components/CardStack';
+import { Ionicons } from '@expo/vector-icons';
+
 
 const HomeScreen = () => {
   const cardStackRef = React.useRef();
+  const [burntPhotos, setBurntPhotos] = React.useState(0);
+
+  React.useEffect(() => {
+    loadBurntPhotos();
+  }, []);
+
+  const loadBurntPhotos = async () => {
+    try {
+      const value = await AsyncStorage.getItem('burntPhotos');
+      if (value !== null) {
+        setBurntPhotos(parseInt(value, 10));
+      }
+    } catch (e) {
+      console.error('Error loading burnt photos count:', e);
+    }
+  };
+
+  const incrementBurntPhotos = async () => {
+    try {
+      const newValue = burntPhotos + 1;
+      setBurntPhotos(newValue);
+      await AsyncStorage.setItem('burntPhotos', newValue.toString());
+    } catch (e) {
+      console.error('Error saving burnt photos count:', e);
+    }
+  };
+
+  const handleSwipe = (direction) => {
+    if (direction === 'left') {
+      incrementBurntPhotos();
+    }
+  };
 
   return (
     <View style={styles.container}>
-      <View style={styles.topIcon}>
+
+      <View style={styles.top}>
         <Image style={{ width: 120, height: 40 }} source={LogoText} />
+        <Text style={styles.topText}>Fotos quemadas: {burntPhotos}</Text>
       </View>
-      <CardStack ref={cardStackRef} />
+
+      <CardStack ref={cardStackRef} onSwipe={handleSwipe} />
+
       <View style={styles.buttonsContainer}>
         <TouchableOpacity
           style={styles.button}
@@ -19,6 +58,7 @@ const HomeScreen = () => {
         >
           <Text style={styles.buttonText}>❌</Text>
         </TouchableOpacity>
+
         <TouchableOpacity
           style={styles.button}
           onPress={() => cardStackRef.current?.swipeRight()}
@@ -26,13 +66,15 @@ const HomeScreen = () => {
           <Text style={styles.buttonText}>💚</Text>
         </TouchableOpacity>
       </View>
+
     </View>
+
   );
 };
 
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  topIcon: { position: 'absolute', top: 50, width: '100%', alignItems: 'center', zIndex: 10 },
+  top: { position: 'absolute', top: 50, width: '100%', alignItems: 'center', zIndex: 10 },
   buttonsContainer: {
     position: 'absolute',
     bottom: 50,
@@ -55,6 +97,14 @@ const styles = StyleSheet.create({
     fontSize: 24,
     textAlign: 'center',
   },
+  top: {
+    position: 'absolute',
+    top: 50,
+    width: '100%',
+    alignItems: 'center',
+    zIndex: 10,
+  },
+
 });
 
 export default HomeScreen;
