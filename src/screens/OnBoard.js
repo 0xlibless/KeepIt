@@ -31,8 +31,8 @@ const OnBoard = ({ navigation }) => {
                     primaryButtonTitle: 'Ok'
                 },
                 {
-                    title: 'No te preocupes si cometes un error',
-                    subtitle: 'Las imagenes quedaran en papelera durante 30 dias',
+                    title: 'Las imagenes se eliminan al instante',
+                    subtitle: 'Ahorra espacio en tu dispositivo con KeepIt',
                     imageUri: Image.resolveAssetSource(Page3).uri,
                     primaryButtonTitle: 'Comenzar'
                 }
