@@ -17,7 +17,7 @@ import { moveToTrash } from './Delete';
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SWIPE_THRESHOLD = SCREEN_WIDTH * 0.25;
 
-const CardStack = forwardRef((props, ref) => {
+const CardStack = forwardRef(({ onSwipe, ...props }, ref) => {
     const [permissionResponse, requestPermission] = MediaLibrary.usePermissions();
     const [photos, setPhotos] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -25,7 +25,6 @@ const CardStack = forwardRef((props, ref) => {
     const [hasNextPage, setHasNextPage] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
 
-    // Animation values
     const translateX = useSharedValue(0);
     const translateY = useSharedValue(0);
 
@@ -34,13 +33,11 @@ const CardStack = forwardRef((props, ref) => {
         swipeRight: () => triggerSwipeRight(),
     }));
 
-    // Reset position helper
     const resetPosition = () => {
         translateX.value = 0;
         translateY.value = 0;
     };
 
-    // Action handlers (JS thread)
     const handleAction = async (deletePhoto) => {
         if (!photos || photos.length === 0 || currentIndex >= photos.length) return;
         const currentPhoto = photos[currentIndex];
@@ -51,9 +48,11 @@ const CardStack = forwardRef((props, ref) => {
         if (deletePhoto) {
             await moveToTrash(currentPhoto);
         }
+        if (onSwipe) {
+            onSwipe(deletePhoto ? 'left' : 'right');
+        }
     };
 
-    // Programmatic triggers
     const triggerSwipeLeft = () => {
         translateX.value = withTiming(-SCREEN_WIDTH * 1.5, {}, () => {
             runOnJS(handleAction)(true);
@@ -66,7 +65,6 @@ const CardStack = forwardRef((props, ref) => {
         });
     };
 
-    // Gesture definition
     const panGesture = Gesture.Pan()
         .onUpdate((event) => {
             translateX.value = event.translationX;
@@ -74,28 +72,24 @@ const CardStack = forwardRef((props, ref) => {
         })
         .onEnd(() => {
             if (translateX.value < -SWIPE_THRESHOLD) {
-                // Swipe Left (Delete)
                 translateX.value = withSpring(-SCREEN_WIDTH * 1.5, {}, () => {
                     runOnJS(handleAction)(true);
                 });
             } else if (translateX.value > SWIPE_THRESHOLD) {
-                // Swipe Right (Keep)
                 translateX.value = withSpring(SCREEN_WIDTH * 1.5, {}, () => {
                     runOnJS(handleAction)(false);
                 });
             } else {
-                // Return to center
                 translateX.value = withSpring(0);
                 translateY.value = withSpring(0);
             }
         });
 
-    // Animated styles
     const animatedCardStyle = useAnimatedStyle(() => {
         const rotate = interpolate(
             translateX.value,
             [-SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2],
-            [-10, 0, 10], // degrees
+            [-10, 0, 10],
             Extrapolation.CLAMP
         );
 

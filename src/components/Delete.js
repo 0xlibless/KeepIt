@@ -5,7 +5,6 @@ import { Alert, Platform } from 'react-native';
 export const moveToTrash = async (assets) => {
     const assetsToArray = Array.isArray(assets) ? assets : [assets];
 
-    // Filtrar assets inválidos
     const validAssets = assetsToArray.filter(a => a && a.id);
 
     if (validAssets.length === 0) {
