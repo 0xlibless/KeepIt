@@ -5,7 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import HomeScreen from '../screens/HomeScreen';
 import OnBoard from '../screens/OnBoard';
 import TrashScreen from '../screens/TrashScreen';
-import Update from '../components/Update';
+import Update from '../utils/CheckUpdate';
 
 const Stack = createStackNavigator();
 

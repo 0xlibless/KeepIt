@@ -1,5 +1,5 @@
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
-import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, Platform } from 'react-native';
 import * as MediaLibrary from 'expo-media-library';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
@@ -133,7 +133,7 @@ const CardStack = forwardRef(({ onSwipe, ...props }, ref) => {
     });
 
     async function loadPhotos(cursor = null) {
-        if (isLoading || !hasNextPage) return;
+        if (isLoading) return;
         setIsLoading(true);
 
         try {
@@ -145,16 +145,36 @@ const CardStack = forwardRef(({ onSwipe, ...props }, ref) => {
                 }
             }
 
-            const assets = await MediaLibrary.getAssetsAsync({
+            let options = {
                 mediaType: ['photo', 'video'],
-                first: 100,
-                after: cursor,
-                sortBy: ['creationTime'],
+                first: 50,
+            };
+
+            if (Platform.OS === 'android') {
+                const totalAssets = await MediaLibrary.getAssetsAsync({
+                    mediaType: ['photo', 'video'],
+                    first: 0
+                });
+
+                if (totalAssets.totalCount > 50) {
+                    const randomOffset = Math.floor(Math.random() * (totalAssets.totalCount - 50));
+                    options.after = String(randomOffset);
+                }
+            } else if (cursor) {
+                options.after = cursor;
+            }
+
+            const assets = await MediaLibrary.getAssetsAsync(options);
+
+            setPhotos(prevPhotos => {
+                const existingIds = new Set(prevPhotos.map(p => p.id));
+                const newItems = assets.assets.filter(item => !existingIds.has(item.id));
+
+                const shuffledBatch = [...newItems].sort(() => 0.5 - Math.random());
+
+                return [...prevPhotos, ...shuffledBatch];
             });
 
-            const newBatch = assets.assets.sort(() => 0.5 - Math.random());
-
-            setPhotos(prevPhotos => [...prevPhotos, ...newBatch]);
             setEndCursor(assets.endCursor);
             setHasNextPage(assets.hasNextPage);
         } catch (error) {

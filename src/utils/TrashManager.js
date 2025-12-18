@@ -5,7 +5,6 @@ const TRASH_KEY = 'keepit_virtual_trash';
 export const addToTrash = async (photo) => {
     try {
         const currentTrash = await getTrash();
-        // Evitar duplicados
         if (currentTrash.some(p => p.id === photo.id)) return true;
 
         const updatedTrash = [...currentTrash, photo];

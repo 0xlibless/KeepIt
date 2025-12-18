@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { getTrash, removeFromTrash, clearTrash } from '../utils/TrashManager';
-import { deleteFile } from '../components/Delete';
+import { deleteFile } from '../utils/DeleteFile';
 import AwesomeAlert from 'react-native-awesome-alerts';
 
 
