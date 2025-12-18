@@ -62,7 +62,7 @@ const HomeScreen = () => {
           style={styles.button}
           onPress={() => cardStackRef.current?.swipeLeft()}
         >
-          <Text style={styles.buttonText}>❌</Text>
+          <Text style={styles.buttonText}>🔥</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
