@@ -2,7 +2,7 @@ import * as MediaLibrary from 'expo-media-library';
 import { Alert, Platform } from 'react-native';
 
 
-export const moveToTrash = async (assets) => {
+export const deleteFile = async (assets) => {
     const assetsToArray = Array.isArray(assets) ? assets : [assets];
 
     const validAssets = assetsToArray.filter(a => a && a.id);
@@ -23,4 +23,4 @@ export const moveToTrash = async (assets) => {
     }
 };
 
-export default moveToTrash;
+export default deleteFile;
