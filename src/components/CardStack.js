@@ -12,7 +12,7 @@ import Animated, {
     withTiming
 } from 'react-native-reanimated';
 import ImageCard from './ImageCard';
-import { moveToTrash } from './Delete';
+import { addToTrash } from '../utils/TrashManager';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SWIPE_THRESHOLD = SCREEN_WIDTH * 0.25;
@@ -46,7 +46,7 @@ const CardStack = forwardRef(({ onSwipe, ...props }, ref) => {
         resetPosition();
 
         if (deletePhoto) {
-            await moveToTrash(currentPhoto);
+            await addToTrash(currentPhoto);
         }
         if (onSwipe) {
             onSwipe(deletePhoto ? 'left' : 'right');
@@ -99,6 +99,36 @@ const CardStack = forwardRef(({ onSwipe, ...props }, ref) => {
                 { translateY: translateY.value },
                 { rotate: `${rotate}deg` },
             ],
+            zIndex: 1,
+        };
+    });
+
+    const backCardStyle = useAnimatedStyle(() => {
+        const scale = interpolate(
+            Math.abs(translateX.value),
+            [0, SCREEN_WIDTH * 0.5],
+            [0.95, 1],
+            Extrapolation.CLAMP
+        );
+
+        const translateYVal = interpolate(
+            Math.abs(translateX.value),
+            [0, SCREEN_WIDTH * 0.5],
+            [10, 0],
+            Extrapolation.CLAMP
+        );
+
+        return {
+            transform: [
+                { scale },
+                { translateY: translateYVal },
+            ],
+            opacity: interpolate(
+                Math.abs(translateX.value),
+                [0, SCREEN_WIDTH * 0.5],
+                [0.8, 1],
+                Extrapolation.CLAMP
+            ),
         };
     });
 
@@ -168,7 +198,7 @@ const CardStack = forwardRef(({ onSwipe, ...props }, ref) => {
     return (
         <View style={styles.container}>
             {nextPhoto && (
-                <View style={[styles.cardContainer, styles.cardBehind]}>
+                <Animated.View style={[styles.cardContainer, styles.cardBehind, backCardStyle]}>
                     <ImageCard
                         image={{ uri: nextPhoto.uri }}
                         title={nextPhoto.filename}
@@ -176,7 +206,7 @@ const CardStack = forwardRef(({ onSwipe, ...props }, ref) => {
                         mediaType={nextPhoto.mediaType}
                         isActive={false}
                     />
-                </View>
+                </Animated.View>
             )}
 
             <GestureDetector gesture={panGesture}>
@@ -215,7 +245,6 @@ const styles = StyleSheet.create({
     },
     cardBehind: {
         zIndex: 0,
-        transform: [{ scale: 0.95 }, { translateY: 10 }],
     }
 });
 

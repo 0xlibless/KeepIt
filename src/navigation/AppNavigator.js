@@ -4,6 +4,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import HomeScreen from '../screens/HomeScreen';
 import OnBoard from '../screens/OnBoard';
+import TrashScreen from '../screens/TrashScreen';
 import Update from '../components/Update';
 
 const Stack = createStackNavigator();
@@ -31,6 +32,7 @@ const AppNavigator = () => {
       <Stack.Navigator initialRouteName={isFirstLaunch ? "OnBoard" : "KeepIt"}>
         <Stack.Screen name="OnBoard" component={OnBoard} options={{ headerShown: false }} />
         <Stack.Screen name="KeepIt" component={HomeScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Trash" component={TrashScreen} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

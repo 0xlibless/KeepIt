@@ -13,7 +13,7 @@ const UpdateChecker = () => {
         fetch('https://api.github.com/repos/AguuZzz/KeepIt/releases/latest')
             .then(res => res.json())
             .then(data => {
-                if (data.name == CURRENT_VERSION) {
+                if (data.name !== CURRENT_VERSION) {
                     console.log('Update detectado 🚀', data.name, CURRENT_VERSION);
                     setLatestVersion(data.name);
                     setShowAlert(true);
