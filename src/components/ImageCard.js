@@ -4,7 +4,7 @@ import { Video, ResizeMode } from 'expo-av';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import * as Sharing from 'expo-sharing';
-import { Linking, Platform } from 'react-native';
+import * as IntentLauncher from 'expo-intent-launcher';
 
 const ImageCard = ({ asset, isActive }) => {
     const { width: windowWidth, height: windowHeight } = useWindowDimensions();
@@ -29,10 +29,17 @@ const ImageCard = ({ asset, isActive }) => {
 
     const handleOpenGallery = async () => {
         try {
-            await Linking.openURL(asset.uri);
-        } catch (error) {
-            console.error("Error opening gallery:", error);
+            await IntentLauncher.startActivityAsync(
+                'android.intent.action.VIEW',
+                {
+                    data: asset.uri,
+                    flags: 1,
+                }
+            );
+        } catch (e) {
+            console.error(e);
         }
+
         setShowMenu(false);
     };
 
@@ -49,7 +56,6 @@ const ImageCard = ({ asset, isActive }) => {
 
     const renderMedia = (resizeMode, style, isBackground = false) => {
         if (isVideo) {
-            // Optimization: If it's the background, use Image (thumbnail) instead of Video to avoid 2x decoders
             if (isBackground) {
                 return <Image source={{ uri }} style={style || styles.image} resizeMode={resizeMode} />;
             }
