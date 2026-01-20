@@ -12,6 +12,7 @@ import Animated, {
     withTiming
 } from 'react-native-reanimated';
 import ImageCard from './ImageCard';
+import SkeletonCard from './SkeletonCard';
 import { addToTrash } from '../utils/TrashManager';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -43,7 +44,6 @@ const CardStack = forwardRef(({ onSwipe, ...props }, ref) => {
         const currentPhoto = photos[currentIndex];
 
         setCurrentIndex(prev => prev + 1);
-        resetPosition();
 
         if (deletePhoto) {
             await addToTrash(currentPhoto);
@@ -52,6 +52,10 @@ const CardStack = forwardRef(({ onSwipe, ...props }, ref) => {
             onSwipe(deletePhoto ? 'left' : 'right');
         }
     };
+
+    useEffect(() => {
+        resetPosition();
+    }, [currentIndex]);
 
     const triggerSwipeLeft = () => {
         translateX.value = withTiming(-SCREEN_WIDTH * 1.5, {}, () => {
@@ -198,8 +202,8 @@ const CardStack = forwardRef(({ onSwipe, ...props }, ref) => {
 
     if (!photos || photos.length === 0) {
         return (
-            <View style={styles.centerContainer}>
-                <Text>Cargando fotos...</Text>
+            <View style={styles.container}>
+                <SkeletonCard />
             </View>
         );
     }
@@ -220,10 +224,7 @@ const CardStack = forwardRef(({ onSwipe, ...props }, ref) => {
             {nextPhoto && (
                 <Animated.View style={[styles.cardContainer, styles.cardBehind, backCardStyle]}>
                     <ImageCard
-                        image={{ uri: nextPhoto.uri }}
-                        title={nextPhoto.filename}
-                        subtitle={new Date(nextPhoto.creationTime).toLocaleDateString()}
-                        mediaType={nextPhoto.mediaType}
+                        asset={nextPhoto}
                         isActive={false}
                     />
                 </Animated.View>
@@ -232,10 +233,7 @@ const CardStack = forwardRef(({ onSwipe, ...props }, ref) => {
             <GestureDetector gesture={panGesture}>
                 <Animated.View style={[styles.cardContainer, animatedCardStyle]}>
                     <ImageCard
-                        image={{ uri: currentPhoto.uri }}
-                        title={currentPhoto.filename}
-                        subtitle={new Date(currentPhoto.creationTime).toLocaleDateString()}
-                        mediaType={currentPhoto.mediaType}
+                        asset={currentPhoto}
                         isActive={true}
                     />
                 </Animated.View>
