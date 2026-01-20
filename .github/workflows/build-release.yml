@@ -52,7 +52,8 @@ jobs:
         shell: bash
 
       - name: ✅ Show detected version
-        run: echo "Detected version: $VERSION (app: $APPNAME)"
+        run: |
+          echo "Detected version: $VERSION (app: $APPNAME)"
 
       - name: 🗂 Ensure eas.json (create preview profile for APK)
         run: |
@@ -80,7 +81,7 @@ jobs:
           set -o pipefail
           echo "Starting EAS build..."
           eas build -p android --profile preview --non-interactive --wait --json > build_output.json
-                    ARTIFACT_URL=$(cat build_output.json | jq -r '.artifacts[0].file // .artifacts[0].url // .artifactUrl // .resultUrl // empty')
+          ARTIFACT_URL=$(cat build_output.json | jq -r '.artifacts[0].file // .artifacts[0].url // .artifactUrl // .resultUrl // empty')
           
           if [ -z "$ARTIFACT_URL" ] || [ "$ARTIFACT_URL" = "null" ]; then
             echo "::error::No se encontró la URL del APK en la salida de EAS."
