@@ -1,0 +1,127 @@
+name: Build Android APK and Create Release
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+    steps:
+      - name: 🏗 Checkout repo
+        uses: actions/checkout@v4
+
+      - name: 🧰 Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'yarn'
+
+      - name: 📦 Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: 🔧 Install jq (JSON tool)
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: 🛠 Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: 🔎 Read app.json (get version & app name)
+        id: meta
+        run: |
+          node -e "
+          const fs = require('fs');
+          const j = JSON.parse(fs.readFileSync('app.json','utf8'));
+          const expo = j.expo || {};
+          console.log('version='+ (expo.version || 'unknown'));
+          console.log('name='+ (expo.name || expo.slug || 'app'));
+          " > meta.txt
+          VERSION=$(grep '^version=' meta.txt | cut -d'=' -f2)
+          APPNAME=$(grep '^name=' meta.txt | cut -d'=' -f2)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "APPNAME=$APPNAME" >> $GITHUB_ENV
+        shell: bash
+
+      - name: ✅ Show detected version
+        run: echo "Detected version: $VERSION (app: $APPNAME)"
+
+      - name: 🗂 Ensure eas.json (create preview profile for APK)
+        run: |
+          if [ ! -f eas.json ]; then
+            cat > eas.json <<'EAS'
+          {
+            "build": {
+              "preview": {
+                "distribution": "store",
+                "android": {
+                  "buildType": "apk"
+                }
+              }
+            }
+          }
+          EAS
+            echo "Created eas.json with profile 'preview' (buildType: apk)"
+          else
+            echo "eas.json already exists, leaving it as-is."
+          fi
+
+      - name: 🚀 Start EAS build (APK)
+        id: eas_build
+        run: |
+          set -o pipefail
+          echo "Starting EAS build..."
+          eas build -p android --profile preview --non-interactive --wait --json > build_output.json
+                    ARTIFACT_URL=$(cat build_output.json | jq -r '.artifacts[0].file // .artifacts[0].url // .artifactUrl // .resultUrl // empty')
+          
+          if [ -z "$ARTIFACT_URL" ] || [ "$ARTIFACT_URL" = "null" ]; then
+            echo "::error::No se encontró la URL del APK en la salida de EAS."
+            cat build_output.json
+            exit 1
+          fi
+          
+          echo "artifact_url=$ARTIFACT_URL" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: ⬇️ Download APK artifact
+        id: download_apk
+        run: |
+          ARTIFACT_URL="${{ steps.eas_build.outputs.artifact_url }}"
+          FILE_NAME="${APPNAME}-${VERSION}.apk"
+          echo "Downloading $FILE_NAME from $ARTIFACT_URL..."
+          curl --location --fail "$ARTIFACT_URL" -o "$FILE_NAME"
+          echo "downloaded_name=$FILE_NAME" >> $GITHUB_OUTPUT
+
+      - name: 📖 Get changelog text
+        id: changelog
+        run: |
+          if [ -f changelog.md ]; then
+            echo "changelog<<EOF" >> $GITHUB_OUTPUT
+            cat changelog.md >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          else
+            echo "changelog<<EOF" >> $GITHUB_OUTPUT
+            echo "No changelog provided." >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          fi
+
+      - name: 🔖 Create Release & Upload APK
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/heads/main')
+        with:
+          tag_name: v${{ env.VERSION }}
+          name: ${{ env.APPNAME }} ${{ env.VERSION }}
+          body: ${{ steps.changelog.outputs.changelog }}
+          files: ${{ steps.download_apk.outputs.downloaded_name }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
