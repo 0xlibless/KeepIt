@@ -2,14 +2,39 @@ import React, { useState } from 'react';
 import { View, Text, Image, StyleSheet, useWindowDimensions, TouchableOpacity } from 'react-native';
 import { Video, ResizeMode } from 'expo-av';
 import { BlurView } from 'expo-blur';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import { Ionicons } from '@expo/vector-icons';
+import * as Sharing from 'expo-sharing';
+import { Linking, Platform } from 'react-native';
 
 const ImageCard = ({ asset, isActive }) => {
     const { width: windowWidth, height: windowHeight } = useWindowDimensions();
     const isLandscapeWindow = windowWidth > windowHeight;
 
     const [isMuted, setIsMuted] = useState(true);
+    const [showMenu, setShowMenu] = useState(false);
+
     const toggleAudio = () => setIsMuted(prev => !prev);
+    const toggleMenu = () => setShowMenu(prev => !prev);
+
+    const handleShare = async () => {
+        try {
+            if (await Sharing.isAvailableAsync()) {
+                await Sharing.shareAsync(asset.uri);
+            }
+        } catch (error) {
+            console.error("Error sharing:", error);
+        }
+        setShowMenu(false);
+    };
+
+    const handleOpenGallery = async () => {
+        try {
+            await Linking.openURL(asset.uri);
+        } catch (error) {
+            console.error("Error opening gallery:", error);
+        }
+        setShowMenu(false);
+    };
 
     const dynamicCardStyle = {
         width: isLandscapeWindow ? '60%' : '85%',
@@ -22,8 +47,12 @@ const ImageCard = ({ asset, isActive }) => {
     const title = asset.filename;
     const subtitle = new Date(asset.creationTime).toLocaleDateString();
 
-    const renderMedia = (resizeMode, style) => {
+    const renderMedia = (resizeMode, style, isBackground = false) => {
         if (isVideo) {
+            // Optimization: If it's the background, use Image (thumbnail) instead of Video to avoid 2x decoders
+            if (isBackground) {
+                return <Image source={{ uri }} style={style || styles.image} resizeMode={resizeMode} />;
+            }
             return (
                 <Video
                     source={{ uri }}
@@ -32,6 +61,7 @@ const ImageCard = ({ asset, isActive }) => {
                     isLooping
                     shouldPlay={isActive}
                     isMuted={isMuted}
+                    onError={(e) => console.log("Video Error:", e)}
                 />
             );
         }
@@ -43,8 +73,7 @@ const ImageCard = ({ asset, isActive }) => {
             {isHorizontal ? (
                 <>
                     <View style={StyleSheet.absoluteFill}>
-
-                        {renderMedia(ResizeMode.COVER, styles.blurBackground)}
+                        {renderMedia(ResizeMode.COVER, styles.blurBackground, true)}
                         <BlurView intensity={70} style={StyleSheet.absoluteFill} tint="dark" />
                     </View>
                     {renderMedia(ResizeMode.CONTAIN)}
@@ -62,6 +91,24 @@ const ImageCard = ({ asset, isActive }) => {
                 <TouchableOpacity style={styles.muteButton} onPress={toggleAudio} activeOpacity={0.8}>
                     <Ionicons name={isMuted ? "volume-mute" : "volume-high"} size={20} color="black" />
                 </TouchableOpacity>
+            )}
+
+            <TouchableOpacity style={styles.optionButton} onPress={toggleMenu} activeOpacity={0.8}>
+                <Ionicons name="ellipsis-horizontal" size={20} color="black" />
+            </TouchableOpacity>
+
+            {showMenu && (
+                <View style={styles.menu}>
+                    <TouchableOpacity style={styles.menuItem} onPress={handleShare}>
+                        <Ionicons name="share-outline" size={20} color="#333" />
+                        <Text style={styles.menuText}>Compartir</Text>
+                    </TouchableOpacity>
+                    <View style={styles.divider} />
+                    <TouchableOpacity style={styles.menuItem} onPress={handleOpenGallery}>
+                        <Ionicons name="images-outline" size={20} color="#333" />
+                        <Text style={styles.menuText}>Galería</Text>
+                    </TouchableOpacity>
+                </View>
             )}
         </View>
     );
@@ -126,5 +173,57 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
+    },
+
+    optionButton: {
+        position: 'absolute',
+        top: 15,
+        left: 15,
+        backgroundColor: 'white',
+        borderRadius: 25,
+        padding: 8,
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 10,
+        elevation: 5,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+    },
+
+    menu: {
+        position: 'absolute',
+        top: 60,
+        left: 15,
+        backgroundColor: 'white',
+        borderRadius: 12,
+        paddingVertical: 5,
+        zIndex: 20,
+        elevation: 10,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.30,
+        shadowRadius: 4.65,
+        minWidth: 140,
+    },
+
+    menuItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: 10,
+        gap: 10,
+    },
+
+    menuText: {
+        fontSize: 14,
+        color: '#333',
+        fontWeight: '500',
+    },
+
+    divider: {
+        height: 1,
+        backgroundColor: '#eee',
+        marginHorizontal: 10,
     },
 });

@@ -39,8 +39,6 @@ const SkeletonCard = () => {
                 <Animated.View style={[styles.textBar, { width: '60%', height: 24, marginBottom: 10 }, animatedStyle]} />
                 <Animated.View style={[styles.textBar, { width: '40%', height: 16 }, animatedStyle]} />
             </View>
-
-            <Animated.View style={[styles.muteButtonPlaceholder, animatedStyle]} />
         </View>
     );
 };
@@ -71,16 +69,7 @@ const styles = StyleSheet.create({
     textBar: {
         backgroundColor: '#555',
         borderRadius: 4,
-    },
-    muteButtonPlaceholder: {
-        position: 'absolute',
-        top: 15,
-        right: 15,
-        width: 36,
-        height: 36,
-        borderRadius: 18,
-        backgroundColor: '#555',
-    },
+    }
 });
 
 export default SkeletonCard;
