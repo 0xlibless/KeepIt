@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { View, Text, Image, StyleSheet, useWindowDimensions, TouchableOpacity } from 'react-native';
 import { Video, ResizeMode } from 'expo-av';
 import { BlurView } from 'expo-blur';
@@ -12,6 +12,7 @@ const ImageCard = ({ asset, isActive }) => {
 
     const [isMuted, setIsMuted] = useState(true);
     const [showMenu, setShowMenu] = useState(false);
+    const videoRef = useRef(null);
 
     const toggleAudio = () => setIsMuted(prev => !prev);
     const toggleMenu = () => setShowMenu(prev => !prev);
@@ -61,13 +62,20 @@ const ImageCard = ({ asset, isActive }) => {
             }
             return (
                 <Video
+                    ref={videoRef}
                     source={{ uri }}
                     style={style || styles.image}
                     resizeMode={resizeMode}
-                    isLooping
+                    isLooping={true}
                     shouldPlay={isActive}
                     isMuted={isMuted}
                     onError={(e) => console.log("Video Error:", e)}
+                    onPlaybackStatusUpdate={(status) => {
+                        if (status.didJustFinish) {
+                            videoRef.current?.setPositionAsync(0);
+                            videoRef.current?.playAsync();
+                        }
+                    }}
                 />
             );
         }
