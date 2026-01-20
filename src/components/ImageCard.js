@@ -118,10 +118,10 @@ const ImageCard = ({ asset, isActive }) => {
                         <Text style={styles.menuText}>Compartir</Text>
                     </TouchableOpacity>
                     <View style={styles.divider} />
-                    <TouchableOpacity style={styles.menuItem} onPress={handleOpenGallery}>
+                    {/* <TouchableOpacity style={styles.menuItem} onPress={handleOpenGallery}>
                         <Ionicons name="images-outline" size={20} color="#333" />
                         <Text style={styles.menuText}>Galería</Text>
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                 </View>
             )}
         </View>
