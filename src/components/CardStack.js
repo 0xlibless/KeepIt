@@ -18,7 +18,10 @@ import { addToTrash } from '../utils/TrashManager';
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SWIPE_THRESHOLD = SCREEN_WIDTH * 0.25;
 
+import { useIsFocused } from '@react-navigation/native';
+
 const CardStack = forwardRef(({ onSwipe, ...props }, ref) => {
+    const isFocused = useIsFocused();
     const [permissionResponse, requestPermission] = MediaLibrary.usePermissions();
     const [photos, setPhotos] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -234,7 +237,7 @@ const CardStack = forwardRef(({ onSwipe, ...props }, ref) => {
                 <Animated.View style={[styles.cardContainer, animatedCardStyle]}>
                     <ImageCard
                         asset={currentPhoto}
-                        isActive={true}
+                        isActive={true && isFocused}
                     />
                 </Animated.View>
             </GestureDetector>
