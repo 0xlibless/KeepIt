@@ -2,6 +2,8 @@
 
 ![GitHub Release](https://img.shields.io/github/v/release/AguuZzz/KeepIt)
 
+![KeepIt Banner](https://github.com/0xlibless/KeepIt/blob/master/BannerReadme.png)
+
 
 **KeepIt** es una app para Android pensada para liberar memoria en tu dispositivo sin perder la cordura en el momento
 
