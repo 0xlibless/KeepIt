@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import Constants from 'expo-constants';
-import { Linking } from 'react-native';
+import { Linking, useColorScheme } from 'react-native';
 
 const CURRENT_VERSION = Constants.expoConfig.version;
 
 const UpdateChecker = () => {
+    const colorScheme = useColorScheme();
+    const isDarkMode = colorScheme === 'dark';
     const [showAlert, setShowAlert] = useState(false);
     const [latestVersion, setLatestVersion] = useState(null);
 
@@ -30,6 +32,9 @@ const UpdateChecker = () => {
             message={`Actualiza la aplicación para obtener las últimas funcionalidades`}
             closeOnTouchOutside={false}
             closeOnHardwareBackPress={false}
+            contentContainerStyle={{ backgroundColor: isDarkMode ? '#1e1e1e' : 'white' }}
+            titleStyle={{ color: isDarkMode ? 'white' : 'black' }}
+            messageStyle={{ color: isDarkMode ? '#eee' : 'black' }}
             showConfirmButton={true}
             confirmText="Actualizar"
             confirmButtonColor="#DD6B55"
