@@ -40,7 +40,7 @@ La app se **dirige** a:
 
 * [ ] **Selección** de carpetas
 * [x] Papelera de reciclaje
-* [ ] Modo oscuro
+* [x] Modo oscuro
 * [ ] **Inglés** / otros idiomas
 
 ---
