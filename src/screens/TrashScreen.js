@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, useColorScheme } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { getTrash, removeFromTrash, clearTrash } from '../utils/TrashManager';
 import { deleteFile } from '../utils/DeleteFile';
 import AwesomeAlert from 'react-native-awesome-alerts';
 
 
+import { useTheme } from '../context/ThemeContext';
+
 const TrashScreen = ({ navigation }) => {
+    const { isDarkMode } = useTheme();
     const [trashItems, setTrashItems] = useState([]);
     const [alert, setAlert] = useState({
         show: false,
@@ -89,12 +92,12 @@ const TrashScreen = ({ navigation }) => {
     );
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { backgroundColor: isDarkMode ? '#121212' : 'white' }]}>
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <Ionicons name="arrow-back" size={28} color="black" />
+                    <Ionicons name="arrow-back" size={28} color={isDarkMode ? 'white' : 'black'} />
                 </TouchableOpacity>
-                <Text style={styles.title}>Papelera ({trashItems.length})</Text>
+                <Text style={[styles.title, { color: isDarkMode ? 'white' : 'black' }]}>Papelera ({trashItems.length})</Text>
                 <TouchableOpacity onPress={handleEmptyTrash}>
                     <Ionicons name="trash-outline" size={28} color="red" />
                 </TouchableOpacity>
@@ -102,7 +105,7 @@ const TrashScreen = ({ navigation }) => {
 
             {trashItems.length === 0 ? (
                 <View style={styles.emptyContainer}>
-                    <Text style={styles.emptyText}>La papelera está vacía</Text>
+                    <Text style={[styles.emptyText, { color: isDarkMode ? '#ccc' : 'grey' }]}>La papelera está vacía</Text>
                 </View>
             ) : (
                 <FlatList
@@ -121,6 +124,9 @@ const TrashScreen = ({ navigation }) => {
                 message={alert.message}
                 closeOnTouchOutside={false}
                 closeOnHardwareBackPress={false}
+                contentContainerStyle={{ backgroundColor: isDarkMode ? '#1e1e1e' : 'white' }}
+                titleStyle={{ color: isDarkMode ? 'white' : 'black' }}
+                messageStyle={{ color: isDarkMode ? '#eee' : 'black' }}
                 showCancelButton={alert.showCancelButton}
                 showConfirmButton={true}
                 cancelText={alert.cancelText}
@@ -134,7 +140,7 @@ const TrashScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: 'white', paddingTop: 50 },
+    container: { flex: 1, paddingTop: 50 },
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',

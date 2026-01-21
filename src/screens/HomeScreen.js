@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, Image, useColorScheme } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LogoText from '../assets/Icons/Logos/LogoText.png';
@@ -7,7 +7,11 @@ import CardStack from '../components/CardStack';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 
+import { useTheme } from '../context/ThemeContext';
+
 const HomeScreen = () => {
+  const { isDarkMode, toggleTheme } = useTheme();
+
   const navigation = useNavigation();
   const cardStackRef = React.useRef();
   const [burntPhotos, setBurntPhotos] = React.useState(0);
@@ -44,30 +48,35 @@ const HomeScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: isDarkMode ? '#121212' : 'white' }]}>
 
       <View style={styles.top}>
         <View style={styles.topRow}>
-          <Image style={{ width: 120, height: 40 }} source={LogoText} />
-          <TouchableOpacity onPress={() => navigation.navigate('Trash')}>
-            <Ionicons name="trash-outline" size={28} color="black" />
-          </TouchableOpacity>
+          <Image style={{ width: 120, height: 40, tintColor: isDarkMode ? 'white' : undefined }} source={LogoText} />
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
+            <TouchableOpacity onPress={toggleTheme}>
+              <Ionicons name={isDarkMode ? "sunny-outline" : "moon-outline"} size={28} color={isDarkMode ? 'white' : 'black'} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('Trash')}>
+              <Ionicons name="trash-outline" size={28} color={isDarkMode ? 'white' : 'black'} />
+            </TouchableOpacity>
+          </View>
         </View>
-        <Text style={styles.topText}>Fotos quemadas: {burntPhotos}</Text>
+        <Text style={[styles.topText, { color: isDarkMode ? 'white' : 'black' }]}>Fotos quemadas: {burntPhotos}</Text>
       </View>
 
       <CardStack ref={cardStackRef} onSwipe={handleSwipe} />
 
       <View style={styles.buttonsContainer}>
         <TouchableOpacity
-          style={styles.button}
+          style={[styles.button, { backgroundColor: isDarkMode ? '#1e1e1e' : 'white' }]}
           onPress={() => cardStackRef.current?.swipeLeft()}
         >
           <Text style={styles.buttonText}>🔥</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={styles.button}
+          style={[styles.button, { backgroundColor: isDarkMode ? '#1e1e1e' : 'white' }]}
           onPress={() => cardStackRef.current?.swipeRight()}
         >
           <Text style={styles.buttonText}>💚</Text>
