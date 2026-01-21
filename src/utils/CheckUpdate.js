@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import AwesomeAlert from 'react-native-awesome-alerts';
+import CustomAlert from '../components/CustomAlert';
 import Constants from 'expo-constants';
 import { Linking, useColorScheme } from 'react-native';
 
@@ -25,13 +25,10 @@ const UpdateChecker = () => {
     }, []);
 
     return (
-        <AwesomeAlert
+        <CustomAlert
             show={showAlert}
-            showProgress={false}
             title="Actualización disponible"
             message={`Actualiza la aplicación para obtener las últimas funcionalidades`}
-            closeOnTouchOutside={false}
-            closeOnHardwareBackPress={false}
             contentContainerStyle={{ backgroundColor: isDarkMode ? '#1e1e1e' : 'white' }}
             titleStyle={{ color: isDarkMode ? 'white' : 'black' }}
             messageStyle={{ color: isDarkMode ? '#eee' : 'black' }}
@@ -42,6 +39,8 @@ const UpdateChecker = () => {
                 setShowAlert(false);
                 Linking.openURL('https://github.com/AguuZzz/KeepIt/releases/latest');
             }}
+            onCancelPressed={() => setShowAlert(false)}
+            isDarkMode={isDarkMode}
         />
     );
 };

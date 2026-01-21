@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, useColorSche
 import { Ionicons } from '@expo/vector-icons';
 import { getTrash, removeFromTrash, clearTrash } from '../utils/TrashManager';
 import { deleteFile } from '../utils/DeleteFile';
-import AwesomeAlert from 'react-native-awesome-alerts';
+import CustomAlert from '../components/CustomAlert';
 import AdsManager from '../utils/Ads';
 
 
@@ -31,13 +31,13 @@ const TrashScreen = ({ navigation }) => {
             showCancelButton: options.showCancelButton || false,
             confirmText: options.confirmText || 'Aceptar',
             cancelText: options.cancelText || 'Cancelar',
-            onConfirm: () => {
-                if (options.onConfirm) options.onConfirm();
+            onConfirm: async () => {
                 setAlert(prev => ({ ...prev, show: false }));
+                if (options.onConfirm) await options.onConfirm();
             },
-            onCancel: () => {
-                if (options.onCancel) options.onCancel();
+            onCancel: async () => {
                 setAlert(prev => ({ ...prev, show: false }));
+                if (options.onCancel) await options.onCancel();
             }
         });
     };
@@ -120,13 +120,10 @@ const TrashScreen = ({ navigation }) => {
                 />
             )}
 
-            <AwesomeAlert
+            <CustomAlert
                 show={alert.show}
-                showProgress={false}
                 title={alert.title}
                 message={alert.message}
-                closeOnTouchOutside={false}
-                closeOnHardwareBackPress={false}
                 contentContainerStyle={{ backgroundColor: isDarkMode ? '#1e1e1e' : 'white' }}
                 titleStyle={{ color: isDarkMode ? 'white' : 'black' }}
                 messageStyle={{ color: isDarkMode ? '#eee' : 'black' }}
@@ -137,6 +134,7 @@ const TrashScreen = ({ navigation }) => {
                 confirmButtonColor="#DD6B55"
                 onCancelPressed={alert.onCancel}
                 onConfirmPressed={alert.onConfirm}
+                isDarkMode={isDarkMode}
             />
         </View>
     );
