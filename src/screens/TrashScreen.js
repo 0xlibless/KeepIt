@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { getTrash, removeFromTrash, clearTrash } from '../utils/TrashManager';
 import { deleteFile } from '../utils/DeleteFile';
 import AwesomeAlert from 'react-native-awesome-alerts';
+import AdsManager from '../utils/Ads';
 
 
 import { useTheme } from '../context/ThemeContext';
@@ -43,6 +44,7 @@ const TrashScreen = ({ navigation }) => {
 
     useEffect(() => {
         loadTrash();
+        AdsManager.loadInterstitial();
     }, []);
 
     const loadTrash = async () => {
@@ -70,6 +72,7 @@ const TrashScreen = ({ navigation }) => {
                     if (success) {
                         await clearTrash();
                         loadTrash();
+                        AdsManager.showInterstitial();
                         triggerAlert('Éxito', 'Papelera vaciada.');
                     } else {
                         triggerAlert('Error', 'No se pudieron eliminar las fotos. Permite que la aplicación pueda deshacerse de ellas');
