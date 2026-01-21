@@ -1,25 +1,25 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image, useColorScheme } from 'react-native';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity, useColorScheme } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LogoText from '../assets/Icons/Logos/LogoText.png';
 import CardStack from '../components/CardStack';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation, useIsFocused } from '@react-navigation/native';
+import { useNavigation, useIsFocused, useFocusEffect } from '@react-navigation/native';
 
 import { useTheme } from '../context/ThemeContext';
 
 const HomeScreen = () => {
   const { isDarkMode, toggleTheme } = useTheme();
+  const [burntPhotos, setBurntPhotos] = useState(0);
 
   const navigation = useNavigation();
   const isFocused = useIsFocused();
   const cardStackRef = React.useRef();
-  const [burntPhotos, setBurntPhotos] = React.useState(0);
-
-  React.useEffect(() => {
-    loadBurntPhotos();
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      loadBurntPhotos();
+    }, [])
+  );
 
   const loadBurntPhotos = async () => {
     try {
@@ -66,7 +66,7 @@ const HomeScreen = () => {
         <Text style={[styles.topText, { color: isDarkMode ? 'white' : 'black' }]}>Fotos quemadas: {burntPhotos}</Text>
       </View>
 
-      {isFocused && <CardStack ref={cardStackRef} onSwipe={handleSwipe} />}
+      <CardStack ref={cardStackRef} onSwipe={handleSwipe} />
 
       <View style={styles.buttonsContainer}>
         <TouchableOpacity
