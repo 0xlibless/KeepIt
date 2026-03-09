@@ -31,6 +31,7 @@ const CardStack = forwardRef(({ onSwipe, ...props }, ref) => {
 
     const translateX = useSharedValue(0);
     const translateY = useSharedValue(0);
+    const cardOpacity = useSharedValue(1);
 
     useImperativeHandle(ref, () => ({
         swipeLeft: () => triggerSwipeLeft(),
@@ -40,6 +41,7 @@ const CardStack = forwardRef(({ onSwipe, ...props }, ref) => {
     const resetPosition = () => {
         translateX.value = 0;
         translateY.value = 0;
+        cardOpacity.value = withTiming(1, { duration: 180 });
     };
 
     const handleAction = async (deletePhoto) => {
@@ -62,12 +64,18 @@ const CardStack = forwardRef(({ onSwipe, ...props }, ref) => {
 
     const triggerSwipeLeft = () => {
         translateX.value = withTiming(-SCREEN_WIDTH * 1.5, {}, () => {
+            cardOpacity.value = 0;
+            translateX.value = 0;
+            translateY.value = 0;
             runOnJS(handleAction)(true);
         });
     };
 
     const triggerSwipeRight = () => {
         translateX.value = withTiming(SCREEN_WIDTH * 1.5, {}, () => {
+            cardOpacity.value = 0;
+            translateX.value = 0;
+            translateY.value = 0;
             runOnJS(handleAction)(false);
         });
     };
@@ -80,10 +88,16 @@ const CardStack = forwardRef(({ onSwipe, ...props }, ref) => {
         .onEnd(() => {
             if (translateX.value < -SWIPE_THRESHOLD) {
                 translateX.value = withSpring(-SCREEN_WIDTH * 1.5, {}, () => {
+                    cardOpacity.value = 0;
+                    translateX.value = 0;
+                    translateY.value = 0;
                     runOnJS(handleAction)(true);
                 });
             } else if (translateX.value > SWIPE_THRESHOLD) {
                 translateX.value = withSpring(SCREEN_WIDTH * 1.5, {}, () => {
+                    cardOpacity.value = 0;
+                    translateX.value = 0;
+                    translateY.value = 0;
                     runOnJS(handleAction)(false);
                 });
             } else {
@@ -101,6 +115,7 @@ const CardStack = forwardRef(({ onSwipe, ...props }, ref) => {
         );
 
         return {
+            opacity: cardOpacity.value,
             transform: [
                 { translateX: translateX.value },
                 { translateY: translateY.value },

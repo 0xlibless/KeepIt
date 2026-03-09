@@ -1,10 +1,11 @@
-import React, { useState, useRef } from 'react';
-import { View, Text, Image, StyleSheet, useWindowDimensions, TouchableOpacity } from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
+import { View, Text, Image, StyleSheet, useWindowDimensions, TouchableOpacity, Platform } from 'react-native';
 import { Video, ResizeMode } from 'expo-av';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import * as Sharing from 'expo-sharing';
 import * as IntentLauncher from 'expo-intent-launcher';
+import * as MediaLibrary from 'expo-media-library';
 
 const ImageCard = ({ asset, isActive }) => {
     const { width: windowWidth, height: windowHeight } = useWindowDimensions();
@@ -12,7 +13,26 @@ const ImageCard = ({ asset, isActive }) => {
 
     const [isMuted, setIsMuted] = useState(true);
     const [showMenu, setShowMenu] = useState(false);
+    const [videoError, setVideoError] = useState(false);
+    const [resolvedVideoUri, setResolvedVideoUri] = useState(null);
     const videoRef = useRef(null);
+
+    const isVideo = asset.mediaType === 'video';
+    const isHorizontal = asset.width > asset.height;
+    const uri = asset.uri;
+    const title = asset.filename;
+    const subtitle = new Date(asset.creationTime).toLocaleDateString();
+
+    useEffect(() => {
+        if (!isVideo) return;
+        if (Platform.OS === 'ios' && uri.startsWith('ph://')) {
+            MediaLibrary.getAssetInfoAsync(asset)
+                .then(info => setResolvedVideoUri(info.localUri || uri))
+                .catch(() => setResolvedVideoUri(uri));
+        } else {
+            setResolvedVideoUri(uri);
+        }
+    }, [uri, isVideo]);
 
     const toggleAudio = () => setIsMuted(prev => !prev);
     const toggleMenu = () => setShowMenu(prev => !prev);
@@ -49,32 +69,29 @@ const ImageCard = ({ asset, isActive }) => {
         height: isLandscapeWindow ? '75%' : '70%',
     };
 
-    const isVideo = asset.mediaType === 'video';
-    const isHorizontal = asset.width > asset.height;
-    const uri = asset.uri;
-    const title = asset.filename;
-    const subtitle = new Date(asset.creationTime).toLocaleDateString();
-
     const renderMedia = (resizeMode, style, isBackground = false) => {
         if (isVideo) {
             if (isBackground) {
                 return <Image source={{ uri }} style={style || styles.image} resizeMode={resizeMode} />;
             }
+            if (!isActive) {
+                return <Image source={{ uri }} style={style || styles.image} resizeMode={resizeMode} />;
+            }
+            if (videoError || !resolvedVideoUri) {
+                return <Image source={{ uri }} style={style || styles.image} resizeMode={resizeMode} />;
+            }
             return (
                 <Video
                     ref={videoRef}
-                    source={{ uri }}
+                    source={{ uri: resolvedVideoUri }}
                     style={style || styles.image}
                     resizeMode={resizeMode}
                     isLooping={true}
                     shouldPlay={isActive}
                     isMuted={isMuted}
-                    onError={(e) => console.log("Video Error:", e)}
-                    onPlaybackStatusUpdate={(status) => {
-                        if (status.didJustFinish) {
-                            videoRef.current?.setPositionAsync(0);
-                            videoRef.current?.playAsync();
-                        }
+                    onError={(e) => {
+                        console.log("Video Error:", e);
+                        setVideoError(true);
                     }}
                 />
             );
