@@ -1,52 +1,71 @@
-# KeepIt
-
-![GitHub Release](https://img.shields.io/github/v/release/AguuZzz/KeepIt)
-
-[Sitio web de KeepIt](https://aguatin.dev/#/keepit)
+<div align="center">
 
 ![KeepIt Banner](https://github.com/0xlibless/KeepIt/blob/master/BannerReadme.png)
 
+<br/>
 
-**KeepIt** es una app para Android pensada para liberar memoria en tu dispositivo sin perder la cordura en el momento
+![GitHub Release](https://img.shields.io/github/v/release/AguuZzz/KeepIt?style=for-the-badge&color=4ade80)
+![Platform](https://img.shields.io/badge/platform-Android-3ddc84?style=for-the-badge&logo=android&logoColor=white)
+![Status](https://img.shields.io/badge/status-available%20now-4ade80?style=for-the-badge)
 
-Cuando necesitamos liberar memoria en nuestros dispositivos, siempre nos quedamos viendo la misma foto 30 veces mientras nos preguntamos
+<br/>
 
-*¿Esto me lo quedo… o se va?*
+# KeepIt
 
-KeepIt toma ese concepto de *Tinder*, de tomar una **decisión** casi sin pensarla, pero esta vez **aplicándolo** en tu **galería**
+**Limpiá tu galería en segundos**
 
----
+[Sitio web](https://aguatin.dev/#/keepit) · [Descargar](https://github.com/AguuZzz/KeepIt/releases/)
 
-## ¿Cómo funciona?
-
-**Fácil**, KeepIt agarra **imágenes** aleatorias de tu **galería** y las presenta en un formato tarjeta con el nombre y la fecha de **creación**, luego te da 2 opciones
-
-* 👉 **Swipe derecha**: la imagen se queda
-* 👈 **Swipe izquierda**: la imagen se elimina
-
-Sin **menús** raros, sin mil botones. **Decisión** rápida, limpia y consciente.
-
-La app se **dirige** a:
-
-* Liberar espacio
-* Ordenar tu **galería**
-* Evitar borrar cosas importantes por error
+</div>
 
 ---
 
-**Conseguí** la **aplicación** para Android **acá**:
+## ¿Qué es KeepIt?
 
-👉 [https://github.com/AguuZzz/KeepIt/releases/](https://github.com/AguuZzz/KeepIt/releases/)
+Cuando necesitás liberar espacio en el celu, siempre terminás en lo mismo: mirando la misma foto 30 veces preguntándote *"¿esto me lo quedo o se va?"*
+
+**KeepIt** aplica la lógica de swipe de Tinder a tu galería. La app te muestra imágenes aleatorias de a una, con su nombre y fecha, y vos decidís al instante:
+
+| Gesto | Acción |
+|---|---|
+| 👉 Swipe derecha | La imagen se queda |
+| 👈 Swipe izquierda | La imagen se elimina |
+
+Sin menús raros. Sin mil botones. Decisión rápida, limpia y consciente.
 
 ---
 
-## TO-DO
+## ¿Para qué sirve?
 
-* [ ] **Selección** de carpetas
-* [x] Papelera de reciclaje
-* [x] Modo oscuro
-* [ ] **Inglés** / otros idiomas
+-  Liberar espacio de forma rápida y sin estrés
+-  Ordenar tu galería de una vez por todas
+-  Evitar borrar cosas importantes por error
 
 ---
 
-La **aplicación** **está** en pañales, **todavía** le queda mucho para ser **exitosa**.
+## Descarga
+
+Conseguí la app para Android acá:
+
+**[→ GitHub Releases](https://github.com/AguuZzz/KeepIt/releases/)**
+
+O aca:
+
+**[→ Sitio web](https://aguatin.dev/#/keepit)**
+
+---
+
+## Roadmap
+
+- [x] Papelera de reciclaje
+- [x] Modo oscuro
+- [ ] Selección de carpetas
+- [ ] Inglés y otros idiomas
+
+---
+
+## Contribuir
+
+La app está en desarrollo activo y todavía le queda camino por recorrer. Si encontrás bugs o tenés ideas, abrí un issue o un PR — toda ayuda suma.
+
+---
